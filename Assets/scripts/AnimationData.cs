@@ -6,4 +6,10 @@ public class AnimationData
 {
     public int assetIDNum;
     public List<AnimationPoint> animationPoints;
+    [System.NonSerialized]
+    public GameObject instance;
+    public AnimationData(GameObject ninstance)
+    {
+        this.instance = ninstance;
+    }
 }

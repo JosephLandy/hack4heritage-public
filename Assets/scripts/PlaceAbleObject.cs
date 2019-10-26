@@ -50,9 +50,9 @@ public class PlaceAbleObject : MonoBehaviour
     [SerializeField]
     Color currentColor;
     [SerializeField]
-    int currentAnimationIndex =0;
+    public int currentAnimationIndex =0;
     [SerializeField]
-    AnimationPoint currentAnimationPoint;
+    public AnimationPoint currentAnimationPoint;
     [SerializeField]
     float animationTransitionPercent;
     [SerializeField]
@@ -60,7 +60,8 @@ public class PlaceAbleObject : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        currentAnimationIndex = 0;
+
     }
     //another hack so we knwo when we are being picked up
     public void pickedup()
@@ -139,5 +140,11 @@ public class PlaceAbleObject : MonoBehaviour
         AnimationPoint animationPointTosave = new AnimationPoint(currentTime,this.transform,currentColor);
         animationData.animationPoints.Add(animationPointTosave);
     }
-
+    public void forceToCurrentAnimationPoint()
+    {
+        this.transform.position = currentAnimationPoint.position;
+        this.transform.eulerAngles = currentAnimationPoint.rotation;
+        this.transform.localScale = currentAnimationPoint.scale;
+        //go to the next one if this animation is done
+    }
 }

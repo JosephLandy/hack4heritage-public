@@ -57,8 +57,10 @@ public static class BinarySerialization
             using (Stream stream = File.Open(realfilePath, FileMode.Open))
             {
                 var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                Debug.Log("Data deserilizing....");
                 return (T)binaryFormatter.Deserialize(stream);
             }
+
         }
         else
         {

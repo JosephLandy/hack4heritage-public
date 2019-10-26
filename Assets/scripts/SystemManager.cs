@@ -24,6 +24,8 @@ public class SystemManager : MonoBehaviour
     [SerializeField]
     Transform propHolder;
 
+    //[SerializeField]
+
 
 
     // Start is called before the first frame update
@@ -67,7 +69,7 @@ public class SystemManager : MonoBehaviour
         {
             //clear all sceen objects
 
-
+            clearSceen();//clean up first
             Debug.Log("loading data....");
             loadData(1);
             Debug.Log("Data loaded!");
@@ -114,7 +116,7 @@ public class SystemManager : MonoBehaviour
     public void initilizeSceen()
     {
         Debug.Log("intilizing sceen");
-        clearSceen();//clean up first
+        
         foreach (AnimationData animatedObject in sceenData.objectAnimationData)
         {
             GameObject newAnimatedGameobject = GameObject.Instantiate(prefabs[animatedObject.assetIDNum]);//instatiate asset
@@ -151,38 +153,62 @@ public class SystemManager : MonoBehaviour
         else
         {
             if (!animatedObject.instance.GetComponent<AnimationObject>().isBeingHeld) {
-                if (animatedObject.currentAnimIndx != animatedObject.animationPoints.Count)
+                if (animatedObject.animationPoints.Count > 0)
                 {
-                    //find the current animation frame and the next animation frame
-                    for (int i = 0; i < animatedObject.animationPoints.Count; i++)
+                    int currentIndex = 0;
+                    int nextIndex = animatedObject.animationPoints.Count - 1;
+                    
+                    //if we before the first point
+                    if(animatedObject.animationPoints[currentIndex].time > currentTime)
                     {
-                        animatedObject.currentAnimIndx = i;
-                        if (currentTime > animatedObject.animationPoints[i].time)
+                        nextIndex = 0;
+                    }
+                    //if after the last 
+                    else if (animatedObject.animationPoints[nextIndex].time < currentTime)
+                    {
+                        currentIndex = nextIndex;
+                    }
+                    else
+                    {
+                        while (animatedObject.animationPoints[currentIndex].time < currentTime)
                         {
-                            
-                            break;
+
+                            currentIndex++;
+                        }
+                        while (animatedObject.animationPoints[nextIndex].time > currentTime)
+                        {
+                            nextIndex--;
+                        }
+
+                        if (nextIndex < 0)
+                        {
+                            nextIndex = 0;
                         }
                     }
-                    AnimationPoint currentAnimPoint = animatedObject.animationPoints[animatedObject.currentAnimIndx];
 
-                    //this sets the next anim point if there is one 
-                    AnimationPoint nextAnimationPoint = animatedObject.animationPoints[animatedObject.currentAnimIndx];
-                    if (animatedObject.currentAnimIndx != animatedObject.animationPoints.Count - 1)
-                    {
-                        nextAnimationPoint = animatedObject.animationPoints[animatedObject.currentAnimIndx];
-                    }
+
+                    AnimationPoint currentAnimPoint = animatedObject.animationPoints[currentIndex];
+                    AnimationPoint nextAnimationPoint = animatedObject.animationPoints[nextIndex];
+
+
+
 
                     //calculate the transition percent btween the current point and the point we are moving to 
-                    float animationTransitionPercent = (currentTime - currentAnimPoint.time) / (nextAnimationPoint.time - currentAnimPoint.time);
+
+                    float animationTransitionPercent = 1;
+                    if(currentIndex != nextIndex)
+                    {
+                        animationTransitionPercent =(currentTime - currentAnimPoint.time) / (nextAnimationPoint.time - currentAnimPoint.time);
+                    }
                     //lerp the transforms 
                     animatedObject.instance.transform.position = Vector3.Lerp(currentAnimPoint.position, nextAnimationPoint.position, animationTransitionPercent);
                     animatedObject.instance.transform.eulerAngles = Vector3.Lerp(currentAnimPoint.rotation, nextAnimationPoint.rotation, animationTransitionPercent);
                     animatedObject.instance.transform.localScale = Vector3.Lerp(currentAnimPoint.scale, nextAnimationPoint.scale, animationTransitionPercent);
-                    Debug.Log("moving object between frame " + animatedObject.currentAnimIndx + " and " + animatedObject.currentAnimIndx + 1 + " %" + animationTransitionPercent);
-
-
+                    Debug.Log("moving object between frame " + currentIndex + " and " + nextIndex + " %" + animationTransitionPercent);
                 }
+
             }
+           
         }
         
     }

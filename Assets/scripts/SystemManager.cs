@@ -6,6 +6,11 @@ public class SystemManager : MonoBehaviour
 {
 
     [SerializeField]
+    public float currentTime;
+    [SerializeField]
+    public bool isPlayingAnim;
+
+    [SerializeField]
     GameObject playerGameObject;
 
     //all the sceen data
@@ -41,6 +46,11 @@ public class SystemManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (isPlayingAnim)
+        {
+            currentTime += Time.deltaTime;
+            animateObjects();
+        }
         if (Input.GetKey(KeyCode.G))
         {
             playerGameObject.transform.localScale += new Vector3(1, 1, 1) * Time.deltaTime;
@@ -120,8 +130,92 @@ public class SystemManager : MonoBehaviour
             }
         }
     }
-    
+
+    //animates all the oobjects 
+    public void animateObjects()
+    {
+        foreach (AnimationData animatedObject in sceenData.objectAnimationData)
+        {
+            animateObject(animatedObject);
+        }
+    }
+
+    //animates a specific object
+    public void animateObject(AnimationData animatedObject)
+    {
+        if (animatedObject.instance == null)
+        {
+            Debug.LogWarning("no isntance of this, this is worrying");
+
+        }
+        else
+        {
+            if (!animatedObject.instance.GetComponent<AnimationObject>().isBeingHeld) {
+                if (animatedObject.currentAnimIndx != animatedObject.animationPoints.Count)
+                {
+                    //find the current animation frame and the next animation frame
+                    for (int i = 0; i < animatedObject.animationPoints.Count; i++)
+                    {
+                        animatedObject.currentAnimIndx = i;
+                        if (currentTime > animatedObject.animationPoints[i].time)
+                        {
+                            
+                            break;
+                        }
+                    }
+                    AnimationPoint currentAnimPoint = animatedObject.animationPoints[animatedObject.currentAnimIndx];
+
+                    //this sets the next anim point if there is one 
+                    AnimationPoint nextAnimationPoint = animatedObject.animationPoints[animatedObject.currentAnimIndx];
+                    if (animatedObject.currentAnimIndx != animatedObject.animationPoints.Count - 1)
+                    {
+                        nextAnimationPoint = animatedObject.animationPoints[animatedObject.currentAnimIndx];
+                    }
+
+                    //calculate the transition percent btween the current point and the point we are moving to 
+                    float animationTransitionPercent = (currentTime - currentAnimPoint.time) / (nextAnimationPoint.time - currentAnimPoint.time);
+                    //lerp the transforms 
+                    animatedObject.instance.transform.position = Vector3.Lerp(currentAnimPoint.position, nextAnimationPoint.position, animationTransitionPercent);
+                    animatedObject.instance.transform.eulerAngles = Vector3.Lerp(currentAnimPoint.rotation, nextAnimationPoint.rotation, animationTransitionPercent);
+                    animatedObject.instance.transform.localScale = Vector3.Lerp(currentAnimPoint.scale, nextAnimationPoint.scale, animationTransitionPercent);
+                    Debug.Log("moving object between frame " + animatedObject.currentAnimIndx + " and " + animatedObject.currentAnimIndx + 1 + " %" + animationTransitionPercent);
 
 
+                }
+            }
+        }
+        
+    }
+    public void addAnimationFrame(GameObject animatedObject)
+    {
+        //loop through untill we find the right one
+        foreach (AnimationData obj in sceenData.objectAnimationData)
+        {
+            if(obj.instance == animatedObject)
+            {
+                //loop through the animation points so we can add at the right spot
+                int insertIndx =0;
+                for (int i = 0; i < obj.animationPoints.Count; i++)
+                {
+                    insertIndx = i;
+                    if ( obj.animationPoints[i].time > currentTime)
+                    {
+                        break;
+                    }
+
+                }
+                //make and insert
+                AnimationPoint animationPointTosave = new AnimationPoint(currentTime, animatedObject.transform, Color.white);
+                if (insertIndx == obj.animationPoints.Count)
+                {
+                    obj.animationPoints.Add(animationPointTosave);
+                }
+                else
+                {
+                    obj.animationPoints.Insert(insertIndx+1, animationPointTosave);
+                }
+            }
+        }
+    }
 
 }

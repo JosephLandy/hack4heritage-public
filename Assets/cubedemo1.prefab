@@ -4831,7 +4831,7 @@ GameObject:
   - component: {fileID: 733923894402266404}
   - component: {fileID: 733923923467721066}
   - component: {fileID: 733923893470161668}
-  - component: {fileID: 845103893521675633}
+  - component: {fileID: 4798546661893166595}
   m_Layer: 0
   m_Name: cubedemo1
   m_TagString: Untagged
@@ -5035,9 +5035,9 @@ MonoBehaviour:
   onAttachedToHand:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 845103893521675633}
-        m_MethodName: SendMessage
-        m_Mode: 5
+      - m_Target: {fileID: 4798546661893166595}
+        m_MethodName: pickedup
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -5049,9 +5049,9 @@ MonoBehaviour:
   onDetachedFromHand:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 845103893521675633}
-        m_MethodName: SendMessage
-        m_Mode: 5
+      - m_Target: {fileID: 4798546661893166595}
+        m_MethodName: droped
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -5106,7 +5106,7 @@ MonoBehaviour:
   previewPoseSelection: 0
   blendingBehaviours: []
   scale: 1
---- !u!114 &845103893521675633
+--- !u!114 &4798546661893166595
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5115,54 +5115,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 844957104479736138}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 91e6d28085615db43bac1457d9c0f961, type: 3}
+  m_Script: {fileID: 11500000, guid: 0603e66accbab114d9f39f7485f0ffcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  systemManager: {fileID: 0}
+  isBeingHeld: 0
   handType: 0
   MenuButton:
     actionPath: /actions/default/in/MenuButton
     needsReinit: 0
-  animationData:
-    assetIDNum: 0
-    animationPoints:
-    - time: 0
-      position:
-        x: 0
-        y: 0
-        z: 0
-      rotation:
-        x: 0
-        y: 0
-        z: 0
-      scale:
-        x: 0
-        y: 0
-        z: 0
-      color:
-        x: 0
-        y: 0
-        z: 0
-  currentTime: 0
-  isRecordingMode: 0
-  currentColor: {r: 0, g: 0, b: 0, a: 0}
-  currentAnimationIndex: 0
-  currentAnimationPoint:
-    time: 0
-    position:
-      x: 0
-      y: 0
-      z: 0
-    rotation:
-      x: 0
-      y: 0
-      z: 0
-    scale:
-      x: 0
-      y: 0
-      z: 0
-    color:
-      x: 0
-      y: 0
-      z: 0
-  animationTransitionPercent: 0
-  isBeingHeld: 0

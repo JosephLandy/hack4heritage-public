@@ -1,5 +1,18 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!65 &6303643880998838705
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2588267992026137694}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.8508458, y: 0.3530187, z: 0.8711093}
+  m_Center: {x: -0.004407704, y: 0.042815447, z: -0.04163146}
 --- !u!1 &3281936194813146521
 GameObject:
   m_ObjectHideFlags: 0
@@ -309,19 +322,6 @@ MonoBehaviour:
   MenuButton:
     actionPath: /actions/default/in/MenuButton
     needsReinit: 0
---- !u!65 &6303643880998838705
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2588267992026137694}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.8508458, y: 0.3530187, z: 0.8711093}
-  m_Center: {x: -0.004407704, y: 0.042815447, z: -0.04163146}
 --- !u!1001 &6303643882061052270
 PrefabInstance:
   m_ObjectHideFlags: 0

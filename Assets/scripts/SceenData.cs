@@ -12,6 +12,7 @@ public class SceenData
     public float sceenLenght;
     [SerializeField]
     public List<AnimationData> objectAnimationData;
+    
     public SceenData()
     {
         sceenLenght = 60;

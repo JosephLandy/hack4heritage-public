@@ -292,7 +292,7 @@ public class SystemManager : MonoBehaviour
         Debug.Log("Recording audio");
         //AudioSource audioSource = GetComponent<AudioSource>();
         //audioData.audioClip = AudioClip.Create("audio", 44100 * 10, 1, 44100, false);
-        audioData.audioClip = Microphone.Start(null, false, 10, 44100);
+        audioData.audioClip = Microphone.Start(null, true, 10, 44100);
         
         //audioSource.Play();
         //audioSource.clip.get

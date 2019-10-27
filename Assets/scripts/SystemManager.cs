@@ -91,8 +91,12 @@ public class SystemManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.K))
         {
             //clear all sceen objects
-            loadSceen();
-            
+
+            clearSceen();//clean up first
+            Debug.Log("loading data....");
+            loadData(1);
+            Debug.Log("Data loaded!");
+            initilizeSceen();
         }
         if (Input.GetKeyDown(KeyCode.U))
         {
@@ -107,14 +111,6 @@ public class SystemManager : MonoBehaviour
             playAudioRecording();
         }
 
-    }
-    public void loadSceen()
-    {
-        clearSceen();//clean up first
-        Debug.Log("loading data....");
-        loadData(1);
-        Debug.Log("Data loaded!");
-        initilizeSceen();
     }
     //makes a new animatable object 
     public void createNewAnimatable(int idNum)
@@ -160,7 +156,6 @@ public class SystemManager : MonoBehaviour
     public void initilizeSceen()
     {
         Debug.Log("intilizing sceen");
-        currentTime = 0;
         
         foreach (AnimationData animatedObject in sceenData.objectAnimationData)
         {

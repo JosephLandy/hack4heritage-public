@@ -23,14 +23,13 @@ public class SystemManager : MonoBehaviour
 
     //prefabs by id in list 
     [SerializeField]
-    List<GameObject> prefabs;
-
-    [SerializeField]
-    Transform propHolder;
+    public List<GameObject> prefabs;
 
     //[SerializeField]
+    //Transform propHolder;
 
-
+    // transform where newly instantiated props will be located, for example, at the hand of the player.
+    public Transform propInstancePoint;
 
     // Start is called before the first frame update
     void Start()
@@ -43,10 +42,10 @@ public class SystemManager : MonoBehaviour
         {
             Debug.LogError("please assign player gameobject");
         }
-        if (propHolder == null)
-        {
-            Debug.LogError("please assign prop holder object that ll props get as parent");
-        }
+        //if (propHolder == null)
+        //{
+        //    Debug.LogError("please assign prop holder object that ll props get as parent");
+        //}
        
     }
 
@@ -103,16 +102,21 @@ public class SystemManager : MonoBehaviour
     public void createNewAnimatable(int idNum)
     {
         //this was so pretty on one line but debuging :(
-        GameObject temp = Instantiate(prefabs[idNum], propHolder);
+        //GameObject temp = Instantiate(prefabs[idNum], propHolder);
+        GameObject temp;
+        if (propInstancePoint != null) {
+             temp = Instantiate(prefabs[idNum], propInstancePoint.position, Quaternion.identity);
+        } else {
+            temp = Instantiate(prefabs[idNum]);
+        }
         AnimationData temp2 = new AnimationData(temp);
         temp2.assetIDNum = idNum;
         sceenData.objectAnimationData.Add(temp2);
-
     }
+
     //loops through all sceen objects and yeets them to the garbage collector 
     public void clearSceen()
     {
-
         foreach (AnimationData animatedObject in sceenData.objectAnimationData)
         {
             Destroy(animatedObject.instance);

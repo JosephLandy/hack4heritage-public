@@ -19,7 +19,7 @@ public class SystemManager : MonoBehaviour
     
     //prefabs by id in list 
     [SerializeField]
-    List<GameObject> prefabs;
+    public List<GameObject> prefabs;
 
     [SerializeField]
     Transform propHolder;

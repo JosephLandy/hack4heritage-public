@@ -16,7 +16,11 @@ public class SystemManager : MonoBehaviour
     //all the sceen data
     [SerializeField]
     SceenData sceenData;
-    
+
+    [SerializeField]
+    public AudioData audioData;
+
+
     //prefabs by id in list 
     [SerializeField]
     List<GameObject> prefabs;
@@ -32,6 +36,7 @@ public class SystemManager : MonoBehaviour
     void Start()
     {
         //set this so our sceen has soem length
+        audioData = new AudioData();
         sceenData = new SceenData();
         sceenData.sceenLenght = 30;
         if (playerGameObject == null)
@@ -53,10 +58,15 @@ public class SystemManager : MonoBehaviour
             currentTime += Time.deltaTime;
             animateObjects();
         }
+        if (Input.GetKey(KeyCode.O))
+        {
+            currentTime = 0;
+        }
         if (Input.GetKey(KeyCode.G))
         {
             playerGameObject.transform.localScale += new Vector3(1, 1, 1) * Time.deltaTime;
         }
+        
         if (Input.GetKey(KeyCode.B))
         {
             playerGameObject.transform.localScale -= new Vector3(1, 1, 1) * Time.deltaTime;
@@ -79,7 +89,14 @@ public class SystemManager : MonoBehaviour
         {
             createNewAnimatable(0);
         }
-
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            startAudioRecording();
+        }
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            playAudioRecording();
+        }
 
     }
     //makes a new animatable object 
@@ -95,6 +112,7 @@ public class SystemManager : MonoBehaviour
     //loops through all sceen objects and yeets them to the garbage collector 
     public void clearSceen()
     {
+
         foreach (AnimationData animatedObject in sceenData.objectAnimationData)
         {
             Destroy(animatedObject.instance);
@@ -107,10 +125,14 @@ public class SystemManager : MonoBehaviour
     /// </summary>
     public void saveData(int saveNumber)
     {
+        audioData.CompressAndStore();
+        BinarySerialization.WriteToBinaryFile(saveNumber.ToString(), "audioData" + saveNumber.ToString(), audioData, false);
         BinarySerialization.WriteToBinaryFile(saveNumber.ToString(), "saveData" + saveNumber.ToString(), sceenData, false);
     }
     public void loadData(int saveNumber)
     {
+        audioData = BinarySerialization.ReadFromBinaryFile<AudioData>(saveNumber.ToString() + "/" + "audioData" + saveNumber.ToString());
+        audioData.DecompressAndLoad();
         sceenData = BinarySerialization.ReadFromBinaryFile<SceenData>(saveNumber.ToString() + "/" + "saveData" + saveNumber.ToString());
     }
     public void initilizeSceen()
@@ -119,17 +141,19 @@ public class SystemManager : MonoBehaviour
         
         foreach (AnimationData animatedObject in sceenData.objectAnimationData)
         {
-            GameObject newAnimatedGameobject = GameObject.Instantiate(prefabs[animatedObject.assetIDNum]);//instatiate asset
+            animatedObject.instance = GameObject.Instantiate(prefabs[animatedObject.assetIDNum]);//instatiate asset
+            
+            
             //force to go to fist postion if there is one
             
-            PlaceAbleObject newAnimatedGameobjectScript= newAnimatedGameobject.GetComponent<PlaceAbleObject>();//get sccript 
+            /*PlaceAbleObject newAnimatedGameobjectScript= newAnimatedGameobject.GetComponent<PlaceAbleObject>();//get sccript 
             if (newAnimatedGameobjectScript.animationData.animationPoints.Count > 0)
             {
                 newAnimatedGameobjectScript.animationData = animatedObject;//set data
                 newAnimatedGameobjectScript.currentAnimationIndex = 0;//set index to zero, probably not needed
                 newAnimatedGameobjectScript.currentAnimationPoint = newAnimatedGameobjectScript.animationData.animationPoints[0];//set the first postion
                 newAnimatedGameobjectScript.forceToCurrentAnimationPoint();//force it to go to the first point 
-            }
+            }*/
         }
     }
 
@@ -204,7 +228,8 @@ public class SystemManager : MonoBehaviour
                     animatedObject.instance.transform.position = Vector3.Lerp(currentAnimPoint.position, nextAnimationPoint.position, animationTransitionPercent);
                     animatedObject.instance.transform.eulerAngles = Vector3.Lerp(currentAnimPoint.rotation, nextAnimationPoint.rotation, animationTransitionPercent);
                     animatedObject.instance.transform.localScale = Vector3.Lerp(currentAnimPoint.scale, nextAnimationPoint.scale, animationTransitionPercent);
-                    Debug.Log("moving object between frame " + currentIndex + " and " + nextIndex + " %" + animationTransitionPercent);
+                    //Debug.Log("moving object between frame " + currentIndex + " and " + nextIndex + " %" + animationTransitionPercent);
+                    animatedObject.instance.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
                 }
 
             }
@@ -212,36 +237,72 @@ public class SystemManager : MonoBehaviour
         }
         
     }
-    public void addAnimationFrame(GameObject animatedObject)
+    public void addAnimationFrame(GameObject animatingObject)
     {
         //loop through untill we find the right one
-        foreach (AnimationData obj in sceenData.objectAnimationData)
+        foreach (AnimationData animatedObject in sceenData.objectAnimationData)
         {
-            if(obj.instance == animatedObject)
+            if(animatedObject.instance == animatingObject)
             {
-                //loop through the animation points so we can add at the right spot
-                int insertIndx =0;
-                for (int i = 0; i < obj.animationPoints.Count; i++)
+                int nextIndex = 0;
+                if (animatedObject.animationPoints.Count > 0)
                 {
-                    insertIndx = i;
-                    if ( obj.animationPoints[i].time > currentTime)
-                    {
-                        break;
-                    }
+                    int currentIndex = 0;
+                    nextIndex = animatedObject.animationPoints.Count - 1;
 
+                    //if we before the first point
+                    if (animatedObject.animationPoints[currentIndex].time > currentTime)
+                    {
+                        nextIndex = 0;
+                    }
+                    //if after the last 
+                    else if (animatedObject.animationPoints[nextIndex].time < currentTime)
+                    {
+                        currentIndex = nextIndex;
+                    }
+                    else
+                    {
+                        while (animatedObject.animationPoints[currentIndex].time < currentTime)
+                        {
+
+                            currentIndex++;
+                        }
+                        while (animatedObject.animationPoints[nextIndex].time > currentTime)
+                        {
+                            nextIndex--;
+                        }
+
+                        if (nextIndex < 0)
+                        {
+                            nextIndex = 0;
+                        }
+                    }
                 }
                 //make and insert
-                AnimationPoint animationPointTosave = new AnimationPoint(currentTime, animatedObject.transform, Color.white);
-                if (insertIndx == obj.animationPoints.Count)
-                {
-                    obj.animationPoints.Add(animationPointTosave);
-                }
-                else
-                {
-                    obj.animationPoints.Insert(insertIndx+1, animationPointTosave);
-                }
+                AnimationPoint animationPointTosave = new AnimationPoint(currentTime, animatingObject.transform, Color.white);
+                animatedObject.animationPoints.Add(animationPointTosave);//add dumbly
+
+                animatedObject.animationPoints.Sort((x, y) => x.time.CompareTo(y.time));//sort them by time os its at the right postion 
+
             }
         }
     }
-
+    public void startAudioRecording()
+    {
+        Debug.Log("Recording audio");
+        //AudioSource audioSource = GetComponent<AudioSource>();
+        //audioData.audioClip = AudioClip.Create("audio", 44100 * 10, 1, 44100, false);
+        audioData.audioClip = Microphone.Start(null, false, 10, 44100);
+        
+        //audioSource.Play();
+        //audioSource.clip.get
+    }
+    public void playAudioRecording()
+    {
+        Debug.Log("playing Audio");
+        AudioSource audioSource = GetComponent<AudioSource>();
+        audioSource.clip = audioData.audioClip;
+        audioSource.Play();
+        
+    }
 }

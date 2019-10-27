@@ -15,7 +15,7 @@ public class SystemManager : MonoBehaviour
 
     //all the sceen data
     [SerializeField]
-    public SceenData sceenData;
+    SceenData sceenData;
 
     [SerializeField]
     public AudioData audioData;
@@ -24,9 +24,6 @@ public class SystemManager : MonoBehaviour
     //prefabs by id in list 
     [SerializeField]
     public List<GameObject> prefabs;
-
-    [SerializeField]
-    public float isRecordingAudio =0;
 
     //[SerializeField]
     //Transform propHolder;
@@ -40,7 +37,7 @@ public class SystemManager : MonoBehaviour
         //set this so our sceen has soem length
         audioData = new AudioData();
         sceenData = new SceenData();
-        sceenData.sceenLenght = 60;
+        sceenData.sceenLenght = 30;
         if (playerGameObject == null)
         {
             Debug.LogError("please assign player gameobject");
@@ -49,27 +46,16 @@ public class SystemManager : MonoBehaviour
         //{
         //    Debug.LogError("please assign prop holder object that ll props get as parent");
         //}
-       for(int i =0; i < prefabs.Count; i++)
-        {
-            createNewAnimatable(i);
-            createNewAnimatable(i);
-        }
-
-
+       
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(isRecordingAudio > 0)
-        {
-            isRecordingAudio -= Time.deltaTime;
-        }
-        animateObjects();
         if (isPlayingAnim)
         {
             currentTime += Time.deltaTime;
-            
+            animateObjects();
         }
         if (Input.GetKey(KeyCode.O))
         {
@@ -315,28 +301,17 @@ public class SystemManager : MonoBehaviour
         Debug.Log("Recording audio");
         //AudioSource audioSource = GetComponent<AudioSource>();
         //audioData.audioClip = AudioClip.Create("audio", 44100 * 10, 1, 44100, false);
-        audioData.audioClip = Microphone.Start(null, false, 60, 44100);
-        isRecordingAudio = 60;
+        audioData.audioClip = Microphone.Start(null, true, 10, 44100);
         
         //audioSource.Play();
         //audioSource.clip.get
     }
     public void playAudioRecording()
     {
-        playAudioRecording(0);
-    }
-    public void playAudioRecording(float playTime)
-    {
         Debug.Log("playing Audio");
         AudioSource audioSource = GetComponent<AudioSource>();
-        audioSource.time = playTime;
         audioSource.clip = audioData.audioClip;
         audioSource.Play();
         
-    }
-    public void stopAudio()
-    {
-        AudioSource audioSource = GetComponent<AudioSource>();
-        audioSource.Stop();
     }
 }
